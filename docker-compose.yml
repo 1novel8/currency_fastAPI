@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  app:
+    depends_on:
+      - mongodb
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${FASTAPI_PORT}:${FASTAPI_PORT}"
+    env_file:
+      - .env
+    volumes:
+      - .:/trading_fastAPI/
+    entrypoint: ./entrypoint-fastapi.sh
+    healthcheck:
+      test: curl --fail http://localhost:8000/health || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - '${MONGO_PORT}:${MONGO_PORT}'
+    volumes:
+      - mongodata:/data/db
+    env_file:
+      - .env
+
+volumes:
+  mongodata:
+
+networks:
+  default:
