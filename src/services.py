@@ -2,7 +2,7 @@ import requests
 
 from src.config import settings
 from src.database import CurrencyRepository
-from src.schemas import Currency
+from src.schemas import Currency, APICurrency
 
 
 class CurrencyService:
@@ -15,18 +15,8 @@ class CurrencyService:
         response = requests.get(url, timeout=3)
         if response.status_code == 200:
             data = response.json()[0]
-            price_for_buy = data['iexAskPrice']
-            price_for_sale = data['iexBidPrice']
-
-            if price_for_buy is None or price_for_sale is None:
-                price_for_buy = data['latestPrice']
-                price_for_sale = data['previousClose']
-
-            currency = Currency(
-                name=name,
-                price_for_sale=price_for_sale,
-                price_for_buy=price_for_buy,
-            )
+            api_currency = APICurrency(**data)
+            currency = Currency.from_api(api_currency=api_currency)
             return currency
         return None
 
