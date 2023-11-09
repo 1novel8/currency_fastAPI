@@ -1,4 +1,4 @@
-from src.database import CurrencyRepository
+from src.repositories import CurrencyRepository
 from src.iex import IEXCloudClient
 from src.schemas import CurrencyDetail
 
