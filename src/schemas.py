@@ -8,7 +8,7 @@ class APICurrency(BaseModel):
     latestPrice: float
 
 
-class Currency(BaseModel):
+class CurrencyDetail(BaseModel):
     name: str
     price_for_buy: float
     price_for_sale: float
@@ -31,5 +31,13 @@ class Currency(BaseModel):
 
 class CurrencyFull(BaseModel):
     name: str
-    price_for_buy: list[float]
-    price_for_sale: list[float]
+    price_for_buy_list: list[float]
+    price_for_sale_list: list[float]
+
+    @classmethod
+    def from_detail(cls, currency_detail: CurrencyDetail):
+        return cls(
+            name=currency_detail.name,
+            price_for_buy_list=[currency_detail.price_for_buy],
+            price_for_sale_list=[currency_detail.price_for_sale],
+        )

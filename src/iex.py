@@ -1,6 +1,6 @@
 import requests
 
-from src.base.abstractions import AbstractApiClient
+from src.abstractions import AbstractApiClient
 from src.config import settings
 from src.schemas import APICurrency
 

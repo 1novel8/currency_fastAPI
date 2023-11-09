@@ -11,7 +11,7 @@ def health():
 
 
 @router.get('/test')
-def test():
+async def test():
     service = CurrencyService()
-    service.fetch_currency_from_iex('tsl')
+    await service.create('tsl')
     return Response(status_code=status.HTTP_200_OK)
