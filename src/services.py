@@ -1,8 +1,6 @@
-import requests
-
-from src.config import settings
 from src.database import CurrencyRepository
-from src.schemas import Currency, APICurrency
+from src.iex.client import IEXCloudClient
+from src.schemas import Currency
 
 
 class CurrencyService:
@@ -10,24 +8,20 @@ class CurrencyService:
 
     @staticmethod
     def fetch_currency_from_iex(name: str) -> Currency | None:
-        api_key = settings.IEX_API_KEY
-        url = f'https://api.iex.cloud/v1/data/core/quote/{name}?token={api_key}'
-        response = requests.get(url, timeout=3)
-        if response.status_code == 200:
-            data = response.json()[0]
-            api_currency = APICurrency(**data)
+        api_currency = IEXCloudClient.request(name=name)
+        if api_currency is not None:
             currency = Currency.from_api(api_currency=api_currency)
             return currency
         return None
 
     async def create(self, name: str) -> None:
         currency = self.fetch_currency_from_iex(name=name)
-        if currency:
+        if currency is not None:
             await self.repository.create(currency=currency)
 
     async def update(self, name: str) -> Currency | None:
         currency = self.fetch_currency_from_iex(name=name)
-        if currency:
+        if currency is not None:
             return await self.repository.update(currency=currency)
         return None
 

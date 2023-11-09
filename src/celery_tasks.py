@@ -16,7 +16,7 @@ app.autodiscover_tasks()
 
 app.conf.task_queues = (
     Queue('default', Exchange('default'), routing_key='default'),
-    Queue('new_currencies',  Exchange('new_currencies'),   routing_key='new_currency'),
+    Queue('new_currencies', Exchange('new_currencies'), routing_key='new_currency'),
     Queue('update_currencies', Exchange('update_currencies'), routing_key='update_currencies'),
 )
 
