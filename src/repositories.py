@@ -6,13 +6,10 @@ from src.schemas import CurrencyDetail, CurrencyFull
 class CurrencyRepository(AbstractMongoRepository):
     collection = trading_collection
 
-    async def create(self, model: CurrencyDetail) -> None:
-        obj = await self.get_by_name_or_none(name=model.name)
-        if obj is not None:
-            return None
-
+    async def create(self, model: CurrencyDetail) -> CurrencyDetail | None:
         currency_full = CurrencyFull.from_detail(currency_detail=model)
         await self.collection.insert_one(currency_full.model_dump())
+        return model
 
     async def get_by_name_or_none(self, name: str) -> dict | None:
         document = {'name': name}
@@ -20,10 +17,6 @@ class CurrencyRepository(AbstractMongoRepository):
         return currency
 
     async def update(self, model: CurrencyDetail) -> CurrencyDetail | None:
-        obj = await self.get_by_name_or_none(name=model.name)
-        if obj is None:
-            return None
-
         filter_ = {"name": model.name}
         append = {
             "$push": {

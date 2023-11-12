@@ -16,8 +16,12 @@ class IEXCloudClient(AbstractApiClient):
             params={'token': cls.api_key},
             timeout=3
         )
-        if response.status_code == 200:
-            data = response.json()[0]
-            api_currency = APICurrency(**data)
-            return api_currency
-        return None
+        if response.status_code != 200:
+            return None
+
+        data = response.json()[0]
+        if data is None:
+            return None
+
+        api_currency = APICurrency(**data)
+        return api_currency
