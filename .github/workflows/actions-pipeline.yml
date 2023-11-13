@@ -1,0 +1,44 @@
+name: CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create .env file
+        run: |
+          touch .env
+          echo "FASTAPI_PORT=${{ secrets.FASTAPI_PORT }}" >> .env
+          echo "FASTAPI_HOST=${{ secrets.FASTAPI_HOST }}" >> .env
+          echo "MONGO_HOST=${{ secrets.MONGO_HOST }}" >> .env
+          echo "MONGO_PORT=${{ secrets.MONGO_PORT }}" >> .env
+          echo "MONGO_DB=${{ secrets.MONGO_DB }}" >> .env
+          echo "IEX_URL=${{ secrets.IEX_URL }}" >> .env
+          echo "IEX_API_KEY=${{ secrets.IEX_API_KEY }}" >> .env
+          echo "ZOOKEEPER_CLIENT_PORT=${{ secrets.ZOOKEEPER_CLIENT_PORT }}" >> .env
+          echo "ZOOKEEPER_TICK_TIME=${{ secrets.ZOOKEEPER_TICK_TIME }}" >> .env
+          echo "KAFKA_BROKER_ID=${{ secrets.KAFKA_BROKER_ID }}" >> .env
+          echo "KAFKA_LISTENERS=${{ secrets.KAFKA_LISTENERS }}" >> .env
+          echo "KAFKA_ADVERTISED_LISTENERS=${{ secrets.KAFKA_ADVERTISED_LISTENERS }}" >> .env
+          echo "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=${{ secrets.KAFKA_LISTENER_SECURITY_PROTOCOL_MAP }}" >> .env
+          echo "KAFKA_INTER_BROKER_LISTENER_NAME=${{ secrets.KAFKA_INTER_BROKER_LISTENER_NAME }}" >> .env
+          echo "KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=${{ secrets.KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR }}" >> .env
+          echo "KAFKA_AUTO_CREATE_TOPICS_ENABLE=${{ secrets.KAFKA_AUTO_CREATE_TOPICS_ENABLE }}" >> .env
+          echo "KAFKA_ZOOKEEPER_CONNECT=${{ secrets.KAFKA_ZOOKEEPER_CONNECT }}" >> .env
+          echo "KAFKA_CREATE_TOPICS=${{ secrets.KAFKA_CREATE_TOPICS }}" >> .env
+          echo "KAFKA_URL=${{ secrets.KAFKA_URL }}" >> .env
+          echo "CELERY_BROKER=${{ secrets.CELERY_BROKER }}" >> .env
+          echo "CELERY_RESULT_BACKEND=${{ secrets.CELERY_RESULT_BACKEND }}" >> .env
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
+
+      - name: Create docker network
+        run: docker network create -d bridge trading
+      - name: Build and start containers
+        run: docker compose up -d
+      - name: Check tests
+        run: docker compose -f docker-compose.yml exec app poetry run pytest src/.
