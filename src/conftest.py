@@ -11,7 +11,7 @@ def mock_iexcloud_request(mocker):
 
 @pytest.fixture
 def mock_get_currency_by_name(mocker):
-    return mocker.patch.object(CurrencyRepository, 'get_by_name_or_none')
+    return mocker.patch.object(CurrencyRepository, 'get_by_name')
 
 
 @pytest.fixture
