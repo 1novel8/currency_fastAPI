@@ -38,5 +38,7 @@ jobs:
 
       - name: Build and start containers
         run: docker compose up -d
+      - name: Create docker network
+        run: docker network create -d bridge trading
       - name: Check tests
         run: docker compose -f docker-compose.yml exec app poetry run pytest src/.
