@@ -36,9 +36,9 @@ jobs:
           echo "CELERY_RESULT_BACKEND=${{ secrets.CELERY_RESULT_BACKEND }}" >> .env
           echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
 
-      - name: Build and start containers
-        run: docker compose up -d
       - name: Create docker network
         run: docker network create -d bridge trading
+      - name: Build and start containers
+        run: docker compose up -d
       - name: Check tests
         run: docker compose -f docker-compose.yml exec app poetry run pytest src/.
