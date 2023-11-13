@@ -19,11 +19,12 @@ class CurrencyService:
         if currency is None:
             return None
 
-        obj = await self.get_by_name_or_none(name=currency.name)
+        obj = await self.get_by_name(name=currency.name)
         if obj is not None:
             return None
 
-        return await self.repository.create(model=currency)
+        await self.repository.create(model=currency)
+        return currency
 
     async def update(self, name: str) -> CurrencyDetail | None:
         currency = self.fetch_currency_from_iex(name=name)
@@ -31,15 +32,16 @@ class CurrencyService:
         if currency is None:
             return None
 
-        obj = await self.get_by_name_or_none(name=currency.name)
+        obj = await self.get_by_name(name=currency.name)
         if obj is None:
             return None
 
-        return await self.repository.update(model=currency)
+        await self.repository.update(model=currency)
+        return currency
 
     async def list_of_names(self) -> list[str]:
         return await self.repository.list_of_names()
 
-    async def get_by_name_or_none(self, name: str) -> dict | None:
-        currency = await self.repository.get_by_name_or_none(name=name)
+    async def get_by_name(self, name: str) -> dict | None:
+        currency = await self.repository.get_by_name(name=name)
         return currency
