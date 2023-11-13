@@ -5,14 +5,8 @@ from pydantic import BaseModel
 
 class AbstractApiClient(ABC):
 
-    @property
     @abstractmethod
-    def api_key(self):
-        ...
-
-    @classmethod
-    @abstractmethod
-    def request(cls, name: str):
+    def request(self, url: str, query_params: dict | None):
         ...
 
 

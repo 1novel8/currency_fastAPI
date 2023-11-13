@@ -6,16 +6,21 @@ from src.schemas import APICurrency
 
 
 class IEXCloudClient(AbstractApiClient):
-    api_key = settings.IEX_API_KEY
 
-    @classmethod
-    def request(cls, name: str) -> APICurrency | None:
-        url = f'https://api.iex.cloud/v1/data/core/quote/{name}'
-        response = requests.get(
-            url,
-            params={'token': cls.api_key},
-            timeout=3
-        )
+    def request(
+            self,
+            url: str,
+            query_params: dict | None = None,
+    ) -> APICurrency | None:
+        try:
+            response = requests.get(
+                url,
+                params=query_params,
+                timeout=3,
+            )
+        except TimeoutError:
+            return None
+
         if response.status_code != 200:
             return None
 

@@ -1,3 +1,4 @@
+from config import settings
 from src.iex import IEXCloudClient
 from src.repositories import CurrencyRepository
 from src.schemas import CurrencyDetail
@@ -8,7 +9,13 @@ class CurrencyService:
 
     @staticmethod
     def fetch_currency_from_iex(name: str) -> CurrencyDetail | None:
-        api_currency = IEXCloudClient.request(name=name)
+        client = IEXCloudClient()
+        url = f'{settings.IEX_URL}/{name}'
+
+        api_currency = client.request(
+            url=url,
+            query_params={'token': settings.IEX_API_KEY}
+        )
         if api_currency is not None:
             currency = CurrencyDetail.from_api(api_currency=api_currency)
             return currency
