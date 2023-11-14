@@ -15,10 +15,12 @@ services:
       - .:/trading_fastAPI/
     entrypoint: ./entrypoint-fastapi.sh
     healthcheck:
-      test: curl --fail http://localhost:8000/health || exit 1
+      test: curl --fail http://localhost:8080/health || exit 1
       interval: 15s
       timeout: 5s
       retries: 5
+    networks:
+      - default
 
   mongodb:
     image: mongo:6-jammy
@@ -28,9 +30,80 @@ services:
       - mongodata:/data/db
     env_file:
       - .env
+    networks:
+      - default
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper
+    env_file:
+      - .env
+    networks:
+      - default
+
+  kafka:
+    image: confluentinc/cp-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    env_file:
+      - .env
+    networks:
+      - default
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: worker
+    entrypoint: ./entrypoint-celery-worker.sh
+    volumes:
+      - .:/trading_fastAPI/
+    env_file:
+      - .env
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      schedule:
+        condition: service_started
+    networks:
+      - default
+
+  schedule:
+    build:
+      context: .
+    hostname: schedule
+    entrypoint: ./entrypoint-celery-schedule.sh
+    volumes:
+      - .:/trading_fastAPI/
+    env_file:
+      - .env
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - default
+
+  redis:
+    image: redis
+    restart: always
+    command: --port '${REDIS_PORT}'
+    networks:
+      - default
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    expose:
+      - '${REDIS_PORT}'
+
 
 volumes:
   mongodata:
 
 networks:
   default:
+    external: true
+    name: trading
