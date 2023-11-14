@@ -1,4 +1,4 @@
-from config import settings
+from src.config import settings
 from src.iex import IEXCloudClient
 from src.repositories import CurrencyRepository
 from src.schemas import CurrencyDetail
